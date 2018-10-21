@@ -93,10 +93,7 @@ class DetoxAssertion {
       }, {
         type: "Invocation",
         value: sanitize_matcher(m)
-      }, {
-        type: "ViewAction",
-        value: searchAction
-      }, {
+      }, searchAction, {
         type: "Invocation",
         value: sanitize_matcher(searchMatcher)
       }]
