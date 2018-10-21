@@ -116,7 +116,10 @@ class Interaction {
 class ActionInteraction extends Interaction {
   constructor(element, action) {
     super();
-    this._call = EspressoDetoxApi.perform(element._call, action._call);
+    console.log('OLD', JSON.stringify(invoke.call(invoke.Android.Class(EspressoDetox), 'perform', element._call, action._call)()));
+    console.log('NEW', JSON.stringify(EspressoDetoxApi.perform(element._call, action._call)));
+    this._call = invoke.call(invoke.Android.Class(EspressoDetox), 'perform', element._call, action._call);
+    // this._call = EspressoDetoxApi.perform(element._call, action._call);
     // TODO: move this.execute() here from the caller
   }
 }
@@ -124,7 +127,10 @@ class ActionInteraction extends Interaction {
 class MatcherAssertionInteraction extends Interaction {
   constructor(element, matcher) {
     super();
-    this._call = DetoxAssertionApi.assertMatcher(element._call, matcher._call);
+    console.log('OLD', JSON.stringify(invoke.call(invoke.Android.Class(DetoxAssertion), 'assertMatcher', element._call, matcher._call)()));
+    console.log('NEW', JSON.stringify(DetoxAssertionApi.assertMatcher(element._call, matcher._call)));
+    this._call = invoke.call(invoke.Android.Class(DetoxAssertion), 'assertMatcher', element._call, matcher._call);
+    // this._call = DetoxAssertionApi.assertMatcher(element._call, matcher._call);
     // TODO: move this.execute() here from the caller
   }
 }
@@ -142,7 +148,31 @@ class WaitForInteraction extends Interaction {
     if (typeof timeout !== 'number') throw new Error(`WaitForInteraction withTimeout argument must be a number, got ${typeof timeout}`);
     if (timeout < 0) throw new Error('timeout must be larger than 0');
 
-    this._call = DetoxAssertionApi.waitForAssertMatcher(this._element._call, this._originalMatcher._call, timeout / 1000);
+    console.log(
+      'OLD',
+      JSON.stringify(
+        invoke.call(
+          invoke.Android.Class(DetoxAssertion),
+          'waitForAssertMatcher',
+          this._element._call,
+          this._originalMatcher._call,
+          invoke.Android.Double(timeout / 1000)
+        )()
+      )
+    );
+    console.log(
+      'NEW',
+      JSON.stringify(DetoxAssertionApi.waitForAssertMatcher(this._element._call, this._originalMatcher._call, timeout / 1000))
+    );
+
+    this._call = invoke.call(
+      invoke.Android.Class(DetoxAssertion),
+      'waitForAssertMatcher',
+      this._element._call,
+      this._originalMatcher._call,
+      invoke.Android.Double(timeout / 1000)
+    );
+    // this._call = DetoxAssertionApi.waitForAssertMatcher(this._element._call, this._originalMatcher._call, timeout / 1000);
     await this.execute();
   }
 
@@ -165,12 +195,44 @@ class WaitForActionInteraction extends Interaction {
   async _execute(searchAction) {
     //if (!searchAction instanceof Action) throw new Error(`WaitForActionInteraction _execute argument must be a valid Action, got ${typeof searchAction}`);
 
-    this._call = DetoxAssertionApi.waitForAssertMatcherWithSearchAction(
+    console.log(
+      'OLD',
+      JSON.stringify(
+        invoke.call(
+          invoke.Android.Class(DetoxAssertion),
+          'waitForAssertMatcherWithSearchAction',
+          this._element._call,
+          this._originalMatcher._call,
+          searchAction._call,
+          this._searchMatcher._call
+        )()
+      )
+    );
+    console.log(
+      'NEW',
+      JSON.stringify(
+        DetoxAssertionApi.waitForAssertMatcherWithSearchAction(
+          this._element._call,
+          this._originalMatcher._call,
+          searchAction._call,
+          this._searchMatcher._call
+        )
+      )
+    );
+    this._call = invoke.call(
+      invoke.Android.Class(DetoxAssertion),
+      'waitForAssertMatcherWithSearchAction',
       this._element._call,
       this._originalMatcher._call,
       searchAction._call,
       this._searchMatcher._call
     );
+    // this._call = DetoxAssertionApi.waitForAssertMatcherWithSearchAction(
+    //   this._element._call,
+    //   this._originalMatcher._call,
+    //   searchAction._call,
+    //   this._searchMatcher._call
+    // );
     await this.execute();
   }
   async scroll(amount, direction = 'down') {
@@ -191,7 +253,18 @@ class Element {
   atIndex(index) {
     if (typeof index !== 'number') throw new Error(`Element atIndex argument must be a number, got ${typeof index}`);
     const matcher = this._originalMatcher;
-    this._originalMatcher._call = DetoxMatcherApi.matcherForAtIndex(index, matcher._call);
+    console.log(
+      'OLD',
+      JSON.stringify(invoke.call(invoke.Android.Class(DetoxMatcher), 'matcherForAtIndex', invoke.Android.Integer(index), matcher._call)())
+    );
+    console.log('NEW', JSON.stringify(DetoxMatcherApi.matcherForAtIndex(index, matcher._call)));
+    this._originalMatcher._call = invoke.call(
+      invoke.Android.Class(DetoxMatcher),
+      'matcherForAtIndex',
+      invoke.Android.Integer(index),
+      matcher._call
+    );
+    // this._originalMatcher._call = DetoxMatcherApi.matcherForAtIndex(index, matcher._call);
     this._selectElementWithMatcher(this._originalMatcher);
     return this;
   }
@@ -244,13 +317,15 @@ class ExpectElement extends Expect {
     return await new MatcherAssertionInteraction(this._element, new VisibleMatcher()).execute();
   }
   async toBeNotVisible() {
-    return await invocationManager.execute(DetoxAssertionApi.assertNotVisible(this._element._call));
+    return await invocationManager.execute(invoke.call(invoke.Android.Class(DetoxAssertion), 'assertNotVisible', this._element._call));
+    // return await invocationManager.execute(DetoxAssertionApi.assertNotVisible(this._element._call));
   }
   async toExist() {
     return await new MatcherAssertionInteraction(this._element, new ExistsMatcher()).execute();
   }
   async toNotExist() {
-    return await invocationManager.execute(DetoxAssertionApi.assertNotExists(this._element._call));
+    return await invocationManager.execute(invoke.call(invoke.Android.Class(DetoxAssertion), 'assertNotExists', this._element._call));
+    // return await invocationManager.execute(DetoxAssertionApi.assertNotExists(this._element._call));
   }
   async toHaveText(value) {
     return await new MatcherAssertionInteraction(this._element, new TextMatcher(value)).execute();
