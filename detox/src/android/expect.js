@@ -27,6 +27,10 @@ function setInvocationManager(im) {
   invocationManager = im;
 }
 
+function call(maybeAFunction) {
+  return maybeAFunction instanceof Function ? maybeAFunction() : maybeAFunction;
+}
+
 class Action {}
 
 class TapAction extends Action {
@@ -117,7 +121,7 @@ class ActionInteraction extends Interaction {
   constructor(element, action) {
     super();
     console.log('OLD', JSON.stringify(invoke.call(invoke.Android.Class(EspressoDetox), 'perform', element._call, action._call)()));
-    console.log('NEW', JSON.stringify(EspressoDetoxApi.perform(element._call, action._call)));
+    console.log('NEW', JSON.stringify(EspressoDetoxApi.perform(call(element._call), action._call)));
     this._call = invoke.call(invoke.Android.Class(EspressoDetox), 'perform', element._call, action._call);
     // this._call = EspressoDetoxApi.perform(element._call, action._call);
     // TODO: move this.execute() here from the caller
@@ -128,7 +132,7 @@ class MatcherAssertionInteraction extends Interaction {
   constructor(element, matcher) {
     super();
     console.log('OLD', JSON.stringify(invoke.call(invoke.Android.Class(DetoxAssertion), 'assertMatcher', element._call, matcher._call)()));
-    console.log('NEW', JSON.stringify(DetoxAssertionApi.assertMatcher(element._call, matcher._call)));
+    console.log('NEW', JSON.stringify(DetoxAssertionApi.assertMatcher(call(element._call), matcher._call)));
     this._call = invoke.call(invoke.Android.Class(DetoxAssertion), 'assertMatcher', element._call, matcher._call);
     // this._call = DetoxAssertionApi.assertMatcher(element._call, matcher._call);
     // TODO: move this.execute() here from the caller
@@ -162,7 +166,7 @@ class WaitForInteraction extends Interaction {
     );
     console.log(
       'NEW',
-      JSON.stringify(DetoxAssertionApi.waitForAssertMatcher(this._element._call, this._originalMatcher._call, timeout / 1000))
+      JSON.stringify(DetoxAssertionApi.waitForAssertMatcher(call(this._element._call), this._originalMatcher._call, timeout / 1000))
     );
 
     this._call = invoke.call(
