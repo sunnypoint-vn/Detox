@@ -17,6 +17,15 @@ const NotExistsMatcher = matchers.NotExistsMatcher;
 const TextMatcher = matchers.TextMatcher;
 const ValueMatcher = matchers.ValueMatcher;
 
+// debug
+const equal = require('deep-equal');
+const jsonDiff = require('json-diff').diffString;
+const diff = (msg, a, b) => {
+  if (!equal(a, b)) {
+    console.log(msg, jsonDiff(a, b));
+  }
+};
+
 let invocationManager;
 
 const DetoxMatcher = 'com.wix.detox.espresso.DetoxMatcher';
@@ -120,8 +129,11 @@ class Interaction {
 class ActionInteraction extends Interaction {
   constructor(element, action) {
     super();
-    console.log('OLD', JSON.stringify(invoke.call(invoke.Android.Class(EspressoDetox), 'perform', element._call, action._call)()));
-    console.log('NEW', JSON.stringify(EspressoDetoxApi.perform(call(element._call), action._call)));
+    diff(
+      'ActionInteraction',
+      invoke.call(invoke.Android.Class(EspressoDetox), 'perform', element._call, action._call)(),
+      EspressoDetoxApi.perform(call(element._call), action._call)
+    );
     this._call = invoke.call(invoke.Android.Class(EspressoDetox), 'perform', element._call, action._call);
     // this._call = EspressoDetoxApi.perform(element._call, action._call);
     // TODO: move this.execute() here from the caller
@@ -131,8 +143,11 @@ class ActionInteraction extends Interaction {
 class MatcherAssertionInteraction extends Interaction {
   constructor(element, matcher) {
     super();
-    console.log('OLD', JSON.stringify(invoke.call(invoke.Android.Class(DetoxAssertion), 'assertMatcher', element._call, matcher._call)()));
-    console.log('NEW', JSON.stringify(DetoxAssertionApi.assertMatcher(call(element._call), matcher._call)));
+    diff(
+      'MatcherAssertionInteraction',
+      invoke.call(invoke.Android.Class(DetoxAssertion), 'assertMatcher', element._call, matcher._call)(),
+      DetoxAssertionApi.assertMatcher(call(element._call), matcher._call)
+    );
     this._call = invoke.call(invoke.Android.Class(DetoxAssertion), 'assertMatcher', element._call, matcher._call);
     // this._call = DetoxAssertionApi.assertMatcher(element._call, matcher._call);
     // TODO: move this.execute() here from the caller
@@ -152,21 +167,16 @@ class WaitForInteraction extends Interaction {
     if (typeof timeout !== 'number') throw new Error(`WaitForInteraction withTimeout argument must be a number, got ${typeof timeout}`);
     if (timeout < 0) throw new Error('timeout must be larger than 0');
 
-    console.log(
-      'OLD',
-      JSON.stringify(
-        invoke.call(
-          invoke.Android.Class(DetoxAssertion),
-          'waitForAssertMatcher',
-          this._element._call,
-          this._originalMatcher._call,
-          invoke.Android.Double(timeout / 1000)
-        )()
-      )
-    );
-    console.log(
-      'NEW',
-      JSON.stringify(DetoxAssertionApi.waitForAssertMatcher(call(this._element._call), this._originalMatcher._call, timeout / 1000))
+    diff(
+      'withTimeout',
+      invoke.call(
+        invoke.Android.Class(DetoxAssertion),
+        'waitForAssertMatcher',
+        this._element._call,
+        this._originalMatcher._call,
+        invoke.Android.Double(timeout / 1000)
+      )(),
+      DetoxAssertionApi.waitForAssertMatcher(call(this._element._call), this._originalMatcher._call, timeout / 1000)
     );
 
     this._call = invoke.call(
@@ -199,30 +209,24 @@ class WaitForActionInteraction extends Interaction {
   async _execute(searchAction) {
     //if (!searchAction instanceof Action) throw new Error(`WaitForActionInteraction _execute argument must be a valid Action, got ${typeof searchAction}`);
 
-    console.log(
-      'OLD',
-      JSON.stringify(
-        invoke.call(
-          invoke.Android.Class(DetoxAssertion),
-          'waitForAssertMatcherWithSearchAction',
-          this._element._call,
-          this._originalMatcher._call,
-          searchAction._call,
-          this._searchMatcher._call
-        )()
+    diff(
+      'WaitForActionInteraction',
+      invoke.call(
+        invoke.Android.Class(DetoxAssertion),
+        'waitForAssertMatcherWithSearchAction',
+        this._element._call,
+        this._originalMatcher._call,
+        searchAction._call,
+        this._searchMatcher._call
+      )(),
+      DetoxAssertionApi.waitForAssertMatcherWithSearchAction(
+        this._element._call,
+        this._originalMatcher._call,
+        searchAction._call,
+        this._searchMatcher._call
       )
     );
-    console.log(
-      'NEW',
-      JSON.stringify(
-        DetoxAssertionApi.waitForAssertMatcherWithSearchAction(
-          this._element._call,
-          this._originalMatcher._call,
-          searchAction._call,
-          this._searchMatcher._call
-        )
-      )
-    );
+
     this._call = invoke.call(
       invoke.Android.Class(DetoxAssertion),
       'waitForAssertMatcherWithSearchAction',
@@ -257,11 +261,13 @@ class Element {
   atIndex(index) {
     if (typeof index !== 'number') throw new Error(`Element atIndex argument must be a number, got ${typeof index}`);
     const matcher = this._originalMatcher;
-    console.log(
-      'OLD',
-      JSON.stringify(invoke.call(invoke.Android.Class(DetoxMatcher), 'matcherForAtIndex', invoke.Android.Integer(index), matcher._call)())
+
+    diff(
+      'atIndex',
+      invoke.call(invoke.Android.Class(DetoxMatcher), 'matcherForAtIndex', invoke.Android.Integer(index), matcher._call)(),
+      DetoxMatcherApi.matcherForAtIndex(index, matcher._call)
     );
-    console.log('NEW', JSON.stringify(DetoxMatcherApi.matcherForAtIndex(index, matcher._call)));
+
     this._originalMatcher._call = invoke.call(
       invoke.Android.Class(DetoxMatcher),
       'matcherForAtIndex',

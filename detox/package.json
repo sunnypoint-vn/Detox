@@ -28,9 +28,11 @@
     "postinstall": "node scripts/postinstall.js"
   },
   "devDependencies": {
+    "deep-equal": "^1.0.1",
     "eslint": "^4.11.0",
     "eslint-plugin-node": "^6.0.1",
     "jest": "22.x.x",
+    "json-diff": "^0.5.3",
     "mockdate": "^2.0.1",
     "prettier": "1.7.0",
     "react-native": "0.56.0"
