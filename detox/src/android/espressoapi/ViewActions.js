@@ -283,10 +283,7 @@ class ViewActions {
         value: "android.support.test.espresso.action.ViewActions"
       },
       method: "repeatedlyUntil",
-      args: [action, {
-        type: "Invocation",
-        value: sanitize_matcher(desiredStateMatcher)
-      }, {
+      args: [action, sanitize_matcher(desiredStateMatcher), {
         type: "Integer",
         value: maxAttempts
       }]

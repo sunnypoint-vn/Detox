@@ -165,14 +165,16 @@ module.exports = function getGenerator({
   function hasProblematicOverloading(instances) {
     // Check if there are same lengthed argument sets
     const knownLengths = [];
-    return instances.map(({ args }) => args.length).reduce((carry, item) => {
-      if (carry || knownLengths.some((l) => l === item)) {
-        return true;
-      }
+    return instances
+      .map(({ args }) => args.length)
+      .reduce((carry, item) => {
+        if (carry || knownLengths.some((l) => l === item)) {
+          return true;
+        }
 
-      knownLengths.push(item);
-      return false;
-    }, false);
+        knownLengths.push(item);
+        return false;
+      }, false);
   }
 
   function sanitizeArgumentType(json) {
@@ -234,22 +236,24 @@ module.exports = function getGenerator({
     'GREYElementInteraction*',
     'String',
     'ArrayList<String>',
-    'ViewAction'
+    'ViewAction',
+    'Matcher<View>'
   ];
 
-  function shouldBeWrapped({ type }) {
-    return !plainArgumentTypes.includes(type);
+  function shouldNotBeWrapped(json) {
+    return (
+      plainArgumentTypes.includes(json.type) || (contentSanitizersForType[json.type] && contentSanitizersForType[json.type].type === null)
+    );
   }
 
   function createReturnStatement(classJson, json) {
-    const args = json.args.map(
-      (arg) =>
-        shouldBeWrapped(arg)
-          ? t.objectExpression([
-              t.objectProperty(t.identifier('type'), t.stringLiteral(addArgumentTypeSanitizer(arg))),
-              t.objectProperty(t.identifier('value'), addArgumentContentSanitizerCall(arg, json.name))
-            ])
-          : addArgumentContentSanitizerCall(arg, json.name)
+    const args = json.args.map((arg) =>
+      shouldNotBeWrapped(arg)
+        ? addArgumentContentSanitizerCall(arg, json.name)
+        : t.objectExpression([
+            t.objectProperty(t.identifier('type'), t.stringLiteral(addArgumentTypeSanitizer(arg))),
+            t.objectProperty(t.identifier('value'), addArgumentContentSanitizerCall(arg, json.name))
+          ])
     );
 
     return t.returnStatement(
@@ -277,8 +281,8 @@ module.exports = function getGenerator({
     return isListOfChecks
       ? typeCheckCreator.map((singleCheck) => singleCheck(json, functionName))
       : typeCheckCreator instanceof Function
-        ? typeCheckCreator(json, functionName)
-        : t.emptyStatement();
+      ? typeCheckCreator(json, functionName)
+      : t.emptyStatement();
   }
 
   function createLogImport(pathFragments) {

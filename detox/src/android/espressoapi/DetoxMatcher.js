@@ -57,13 +57,7 @@ class DetoxMatcher {
         value: "com.wix.detox.espresso.DetoxMatcher"
       },
       method: "matcherForAnd",
-      args: [{
-        type: "Invocation",
-        value: sanitize_matcher(m1)
-      }, {
-        type: "Invocation",
-        value: sanitize_matcher(m2)
-      }]
+      args: [sanitize_matcher(m1), sanitize_matcher(m2)]
     };
   }
 
@@ -74,13 +68,7 @@ class DetoxMatcher {
         value: "com.wix.detox.espresso.DetoxMatcher"
       },
       method: "matcherForOr",
-      args: [{
-        type: "Invocation",
-        value: sanitize_matcher(m1)
-      }, {
-        type: "Invocation",
-        value: sanitize_matcher(m2)
-      }]
+      args: [sanitize_matcher(m1), sanitize_matcher(m2)]
     };
   }
 
@@ -91,10 +79,7 @@ class DetoxMatcher {
         value: "com.wix.detox.espresso.DetoxMatcher"
       },
       method: "matcherForNot",
-      args: [{
-        type: "Invocation",
-        value: sanitize_matcher(m)
-      }]
+      args: [sanitize_matcher(m)]
     };
   }
 
@@ -105,13 +90,7 @@ class DetoxMatcher {
         value: "com.wix.detox.espresso.DetoxMatcher"
       },
       method: "matcherWithAncestor",
-      args: [{
-        type: "Invocation",
-        value: sanitize_matcher(m)
-      }, {
-        type: "Invocation",
-        value: sanitize_matcher(ancestorMatcher)
-      }]
+      args: [sanitize_matcher(m), sanitize_matcher(ancestorMatcher)]
     };
   }
 
@@ -122,13 +101,7 @@ class DetoxMatcher {
         value: "com.wix.detox.espresso.DetoxMatcher"
       },
       method: "matcherWithDescendant",
-      args: [{
-        type: "Invocation",
-        value: sanitize_matcher(m)
-      }, {
-        type: "Invocation",
-        value: sanitize_matcher(descendantMatcher)
-      }]
+      args: [sanitize_matcher(m), sanitize_matcher(descendantMatcher)]
     };
   }
 
@@ -199,10 +172,7 @@ class DetoxMatcher {
       args: [{
         type: "Integer",
         value: index
-      }, {
-        type: "Invocation",
-        value: sanitize_matcher(innerMatcher)
-      }]
+      }, sanitize_matcher(innerMatcher)]
     };
   }
 
