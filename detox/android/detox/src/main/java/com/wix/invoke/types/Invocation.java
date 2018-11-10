@@ -66,7 +66,7 @@ public class Invocation {
             Object argument = null;
             if (args.get(i).getClass() == String.class) {
                 argument = args.get(i);
-            } else if(args.get(i).getClass() == JSONArray.class) {
+            } else if (args.get(i).getClass() == JSONArray.class) {
                 JSONArray jsonArray = (JSONArray) args.get(i);
                 List<String> list = new ArrayList<>();
                 for (int j = 0; j < jsonArray.length(); j++) {
@@ -92,9 +92,9 @@ public class Invocation {
                     } else if (type.equals("boolean")) {
                         argument = jsonArgument.optBoolean("value");
                     } else if (type.equals("Invocation")) {
-                        argument = new Invocation(jsonArgument.optJSONObject("value"));                        
+                        argument = new Invocation(jsonArgument.optJSONObject("value"));
                     } else {
-                        throw new RuntimeException("Unhandled arg type" + type);
+                        throw new RuntimeException("Unhandled arg type" + type + jsonArgument.toString());
                     }
                 }
             }
@@ -120,13 +120,13 @@ public class Invocation {
                     argument = Double.valueOf(value.toString());
                 } else if (type.equals("String")) {
                     argument = (String) value;
-                }else if (type.equals("Boolean")) {
+                } else if (type.equals("Boolean")) {
                     argument = ((Boolean) value);
                 } else if (type.equals("boolean")) {
                     argument = ((Boolean) value).booleanValue();
                 } else if (type.equals("Invocation")) {
                     JsonParser parser = new JsonParser();
-                    argument = parser.parse((String)value);
+                    argument = parser.parse((String) value);
                 } else {
                     throw new RuntimeException("Unhandled arg type" + type);
                 }
@@ -138,16 +138,19 @@ public class Invocation {
         this.args = args;
     }
 
-
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Invocation)) return false;
+        if (this == o)
+            return true;
+        if (!(o instanceof Invocation))
+            return false;
 
         Invocation that = (Invocation) o;
 
-        if (target != null ? !target.equals(that.target) : that.target != null) return false;
-        if (method != null ? !method.equals(that.method) : that.method != null) return false;
+        if (target != null ? !target.equals(that.target) : that.target != null)
+            return false;
+        if (method != null ? !method.equals(that.method) : that.method != null)
+            return false;
         return Arrays.equals(args, that.args);
 
     }
