@@ -146,7 +146,7 @@ class MatcherAssertionInteraction extends Interaction {
     diff(
       'MatcherAssertionInteraction',
       invoke.call(invoke.Android.Class(DetoxAssertion), 'assertMatcher', element._call, matcher._call)(),
-      DetoxAssertionApi.assertMatcher(call(element._call), matcher._call)
+      DetoxAssertionApi.assertMatcher(call(element._call), matcher._call.value)
     );
     this._call = invoke.call(invoke.Android.Class(DetoxAssertion), 'assertMatcher', element._call, matcher._call);
     // this._call = DetoxAssertionApi.assertMatcher(element._call, matcher._call);
@@ -176,7 +176,7 @@ class WaitForInteraction extends Interaction {
         this._originalMatcher._call,
         invoke.Android.Double(timeout / 1000)
       )(),
-      DetoxAssertionApi.waitForAssertMatcher(call(this._element._call), this._originalMatcher._call, timeout / 1000)
+      DetoxAssertionApi.waitForAssertMatcher(call(this._element._call), this._originalMatcher._call.value, timeout / 1000)
     );
 
     this._call = invoke.call(
@@ -220,10 +220,10 @@ class WaitForActionInteraction extends Interaction {
         this._searchMatcher._call
       )(),
       DetoxAssertionApi.waitForAssertMatcherWithSearchAction(
-        this._element._call,
-        this._originalMatcher._call,
-        searchAction._call,
-        this._searchMatcher._call
+        call(this._element._call),
+        call(this._originalMatcher._call).value,
+        call(searchAction._call),
+        call(this._searchMatcher._call).value
       )
     );
 
@@ -265,7 +265,7 @@ class Element {
     diff(
       'atIndex',
       invoke.call(invoke.Android.Class(DetoxMatcher), 'matcherForAtIndex', invoke.Android.Integer(index), matcher._call)(),
-      DetoxMatcherApi.matcherForAtIndex(index, matcher._call)
+      DetoxMatcherApi.matcherForAtIndex(index, matcher._call.value)
     );
 
     this._originalMatcher._call = invoke.call(
