@@ -129,13 +129,7 @@ class Interaction {
 class ActionInteraction extends Interaction {
   constructor(element, action) {
     super();
-    diff(
-      'ActionInteraction',
-      invoke.call(invoke.Android.Class(EspressoDetox), 'perform', element._call, action._call)(),
-      EspressoDetoxApi.perform(call(element._call), action._call)
-    );
-    this._call = invoke.call(invoke.Android.Class(EspressoDetox), 'perform', element._call, action._call);
-    // this._call = EspressoDetoxApi.perform(element._call, action._call);
+    this._call = EspressoDetoxApi.perform(call(element._call), action._call);
     // TODO: move this.execute() here from the caller
   }
 }
@@ -143,13 +137,7 @@ class ActionInteraction extends Interaction {
 class MatcherAssertionInteraction extends Interaction {
   constructor(element, matcher) {
     super();
-    diff(
-      'MatcherAssertionInteraction',
-      invoke.call(invoke.Android.Class(DetoxAssertion), 'assertMatcher', element._call, matcher._call)(),
-      DetoxAssertionApi.assertMatcher(call(element._call), matcher._call.value)
-    );
-    this._call = invoke.call(invoke.Android.Class(DetoxAssertion), 'assertMatcher', element._call, matcher._call);
-    // this._call = DetoxAssertionApi.assertMatcher(element._call, matcher._call);
+    this._call = DetoxAssertionApi.assertMatcher(call(element._call), matcher._call.value);
     // TODO: move this.execute() here from the caller
   }
 }
@@ -167,26 +155,7 @@ class WaitForInteraction extends Interaction {
     if (typeof timeout !== 'number') throw new Error(`WaitForInteraction withTimeout argument must be a number, got ${typeof timeout}`);
     if (timeout < 0) throw new Error('timeout must be larger than 0');
 
-    diff(
-      'withTimeout',
-      invoke.call(
-        invoke.Android.Class(DetoxAssertion),
-        'waitForAssertMatcher',
-        this._element._call,
-        this._originalMatcher._call,
-        invoke.Android.Double(timeout / 1000)
-      )(),
-      DetoxAssertionApi.waitForAssertMatcher(call(this._element._call), this._originalMatcher._call.value, timeout / 1000)
-    );
-
-    this._call = invoke.call(
-      invoke.Android.Class(DetoxAssertion),
-      'waitForAssertMatcher',
-      this._element._call,
-      this._originalMatcher._call,
-      invoke.Android.Double(timeout / 1000)
-    );
-    // this._call = DetoxAssertionApi.waitForAssertMatcher(this._element._call, this._originalMatcher._call, timeout / 1000);
+    this._call = DetoxAssertionApi.waitForAssertMatcher(call(this._element._call), this._originalMatcher._call.value, timeout / 1000);
     await this.execute();
   }
 
@@ -209,38 +178,13 @@ class WaitForActionInteraction extends Interaction {
   async _execute(searchAction) {
     //if (!searchAction instanceof Action) throw new Error(`WaitForActionInteraction _execute argument must be a valid Action, got ${typeof searchAction}`);
 
-    diff(
-      'WaitForActionInteraction',
-      invoke.call(
-        invoke.Android.Class(DetoxAssertion),
-        'waitForAssertMatcherWithSearchAction',
-        this._element._call,
-        this._originalMatcher._call,
-        searchAction._call,
-        this._searchMatcher._call
-      )(),
-      DetoxAssertionApi.waitForAssertMatcherWithSearchAction(
-        call(this._element._call),
-        call(this._originalMatcher._call).value,
-        call(searchAction._call),
-        call(this._searchMatcher._call).value
-      )
+    this._call = DetoxAssertionApi.waitForAssertMatcherWithSearchAction(
+      call(this._element._call),
+      call(this._originalMatcher._call).value,
+      call(searchAction._call),
+      call(this._searchMatcher._call).value
     );
 
-    this._call = invoke.call(
-      invoke.Android.Class(DetoxAssertion),
-      'waitForAssertMatcherWithSearchAction',
-      this._element._call,
-      this._originalMatcher._call,
-      searchAction._call,
-      this._searchMatcher._call
-    );
-    // this._call = DetoxAssertionApi.waitForAssertMatcherWithSearchAction(
-    //   this._element._call,
-    //   this._originalMatcher._call,
-    //   searchAction._call,
-    //   this._searchMatcher._call
-    // );
     await this.execute();
   }
   async scroll(amount, direction = 'down') {
@@ -262,19 +206,7 @@ class Element {
     if (typeof index !== 'number') throw new Error(`Element atIndex argument must be a number, got ${typeof index}`);
     const matcher = this._originalMatcher;
 
-    diff(
-      'atIndex',
-      invoke.call(invoke.Android.Class(DetoxMatcher), 'matcherForAtIndex', invoke.Android.Integer(index), matcher._call)(),
-      DetoxMatcherApi.matcherForAtIndex(index, matcher._call.value)
-    );
-
-    this._originalMatcher._call = invoke.call(
-      invoke.Android.Class(DetoxMatcher),
-      'matcherForAtIndex',
-      invoke.Android.Integer(index),
-      matcher._call
-    );
-    // this._originalMatcher._call = DetoxMatcherApi.matcherForAtIndex(index, matcher._call);
+    this._originalMatcher._call = DetoxMatcherApi.matcherForAtIndex(index, matcher._call.value);
     this._selectElementWithMatcher(this._originalMatcher);
     return this;
   }
