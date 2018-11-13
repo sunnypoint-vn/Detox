@@ -24,7 +24,10 @@ class DetoxAssertion {
       args: [{
         type: "Invocation",
         value: i
-      }, sanitize_matcher(m)]
+      }, {
+        type: "Invocation",
+        value: sanitize_matcher(m)
+      }]
     };
   }
 
@@ -67,7 +70,10 @@ class DetoxAssertion {
       args: [{
         type: "Invocation",
         value: i
-      }, sanitize_matcher(m), {
+      }, {
+        type: "Invocation",
+        value: sanitize_matcher(m)
+      }, {
         type: "Double",
         value: timeoutSeconds
       }]
@@ -84,7 +90,13 @@ class DetoxAssertion {
       args: [{
         type: "Invocation",
         value: i
-      }, sanitize_matcher(m), searchAction, sanitize_matcher(searchMatcher)]
+      }, {
+        type: "Invocation",
+        value: sanitize_matcher(m)
+      }, searchAction, {
+        type: "Invocation",
+        value: sanitize_matcher(searchMatcher)
+      }]
     };
   }
 

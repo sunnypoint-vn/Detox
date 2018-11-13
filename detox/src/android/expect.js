@@ -23,8 +23,6 @@ const jsonDiff = require('json-diff').diffString;
 const diff = (msg, a, b) => {
   if (!equal(a, b)) {
     console.log(msg, jsonDiff(a, b));
-  } else {
-    console.log(msg, 'is the same');
   }
 };
 

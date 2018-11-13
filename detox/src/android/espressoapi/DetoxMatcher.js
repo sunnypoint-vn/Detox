@@ -57,7 +57,13 @@ class DetoxMatcher {
         value: "com.wix.detox.espresso.DetoxMatcher"
       },
       method: "matcherForAnd",
-      args: [sanitize_matcher(m1), sanitize_matcher(m2)]
+      args: [{
+        type: "Invocation",
+        value: sanitize_matcher(m1)
+      }, {
+        type: "Invocation",
+        value: sanitize_matcher(m2)
+      }]
     };
   }
 
@@ -68,7 +74,13 @@ class DetoxMatcher {
         value: "com.wix.detox.espresso.DetoxMatcher"
       },
       method: "matcherForOr",
-      args: [sanitize_matcher(m1), sanitize_matcher(m2)]
+      args: [{
+        type: "Invocation",
+        value: sanitize_matcher(m1)
+      }, {
+        type: "Invocation",
+        value: sanitize_matcher(m2)
+      }]
     };
   }
 
@@ -79,7 +91,10 @@ class DetoxMatcher {
         value: "com.wix.detox.espresso.DetoxMatcher"
       },
       method: "matcherForNot",
-      args: [sanitize_matcher(m)]
+      args: [{
+        type: "Invocation",
+        value: sanitize_matcher(m)
+      }]
     };
   }
 
@@ -90,7 +105,13 @@ class DetoxMatcher {
         value: "com.wix.detox.espresso.DetoxMatcher"
       },
       method: "matcherWithAncestor",
-      args: [sanitize_matcher(m), sanitize_matcher(ancestorMatcher)]
+      args: [{
+        type: "Invocation",
+        value: sanitize_matcher(m)
+      }, {
+        type: "Invocation",
+        value: sanitize_matcher(ancestorMatcher)
+      }]
     };
   }
 
@@ -101,7 +122,13 @@ class DetoxMatcher {
         value: "com.wix.detox.espresso.DetoxMatcher"
       },
       method: "matcherWithDescendant",
-      args: [sanitize_matcher(m), sanitize_matcher(descendantMatcher)]
+      args: [{
+        type: "Invocation",
+        value: sanitize_matcher(m)
+      }, {
+        type: "Invocation",
+        value: sanitize_matcher(descendantMatcher)
+      }]
     };
   }
 
@@ -172,7 +199,10 @@ class DetoxMatcher {
       args: [{
         type: "Integer",
         value: index
-      }, sanitize_matcher(innerMatcher)]
+      }, {
+        type: "Invocation",
+        value: sanitize_matcher(innerMatcher)
+      }]
     };
   }
 
