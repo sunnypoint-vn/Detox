@@ -23,6 +23,8 @@ const jsonDiff = require('json-diff').diffString;
 const diff = (msg, a, b) => {
   if (!equal(a, b)) {
     console.log(msg, jsonDiff(a, b));
+  } else {
+    console.log(msg, 'is equal');
   }
 };
 
@@ -206,7 +208,22 @@ class Element {
     if (typeof index !== 'number') throw new Error(`Element atIndex argument must be a number, got ${typeof index}`);
     const matcher = this._originalMatcher;
 
-    this._originalMatcher._call = DetoxMatcherApi.matcherForAtIndex(index, matcher._call.value);
+    diff(
+      'atIndex',
+      invoke.call(invoke.Android.Class(DetoxMatcher), 'matcherForAtIndex', invoke.Android.Integer(index), matcher._call)(),
+      DetoxMatcherApi.matcherForAtIndex(index, matcher._call.value)
+    );
+
+    // This fails
+    // this._originalMatcher._call = DetoxMatcherApi.matcherForAtIndex(index, matcher._call.value);
+
+    // This works
+    this._originalMatcher._call = invoke.call(
+      invoke.Android.Class(DetoxMatcher),
+      'matcherForAtIndex',
+      invoke.Android.Integer(index),
+      matcher._call
+    );
     this._selectElementWithMatcher(this._originalMatcher);
     return this;
   }
