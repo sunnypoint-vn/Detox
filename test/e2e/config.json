@@ -1,6 +1,0 @@
-{
-  "setupTestFrameworkScriptFile" : "./helpers/init.js",
-  "testEnvironment": "node",
-  "bail": false,
-  "verbose": true
-}
