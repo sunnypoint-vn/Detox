@@ -1,6 +1,7 @@
 const _ = require('lodash');
 const fs = require('fs');
 const path = require('path');
+const log = require('../utils/logger').child({ __filename });
 const argparse = require('../utils/argparse');
 const debug = require('../utils/debug'); //debug utils, leave here even if unused
 
@@ -45,15 +46,17 @@ class Device {
     const hasPayload = this._assertHasSingleParam(payloadParams, params);
 
     if (params.delete) {
-      await this._terminateApp();
-      await this._reinstallApp();
+      await this.deviceDriver.terminate(this._deviceId, this._bundleId);
+      await this.deviceDriver.uninstallApp(this._deviceId, this._bundleId);
+      await this.deviceDriver.installApp(this._deviceId, this._binaryPath, this._testBinaryPath);
     } else if (params.newInstance) {
-      await this._terminateApp();
+      await this.deviceDriver.terminate(this._deviceId, this._bundleId);
     }
 
-    let baseLaunchArgs = {
-      ...params.launchArgs,
-    };
+    let baseLaunchArgs = {};
+    if (params.launchArgs) {
+      baseLaunchArgs = params.launchArgs;
+    }
 
     if (params.url) {
       baseLaunchArgs['detoxURLOverride'] = params.url;
@@ -249,16 +252,6 @@ class Device {
     } else {
       throw new Error(`app binary not found at '${absPath}', did you build it?`);
     }
-  }
-
-  async _terminateApp() {
-    await this.deviceDriver.terminate(this._deviceId, this._bundleId);
-    this._processes[this._bundleId] = undefined;
-  }
-
-  async _reinstallApp() {
-    await this.deviceDriver.uninstallApp(this._deviceId, this._bundleId);
-    await this.deviceDriver.installApp(this._deviceId, this._binaryPath, this._testBinaryPath);
   }
 }
 

@@ -29,15 +29,11 @@ class Emulator {
   async boot(emulatorName) {
     const emulatorArgs = _.compact([
       '-verbose',
+      '-gpu', this.gpuMethod(),
       '-no-audio',
       argparse.getArgValue('headless') ? '-no-window' : '',
       `@${emulatorName}`
     ]);
-
-    const gpuMethod = this.gpuMethod();
-    if(gpuMethod) {
-      emulatorArgs.push('-gpu', gpuMethod);
-    }
 
     let childProcessOutput;
     const tempLog = `./${emulatorName}.log`;
@@ -86,11 +82,6 @@ class Emulator {
   }
 
   gpuMethod() {
-    const gpuArgument = argparse.getArgValue('gpu');
-    if(gpuArgument) {
-      return gpuArgument;
-    }
-
     if (argparse.getArgValue('headless')) {
       switch (os.platform()) {
         case 'darwin':
@@ -102,9 +93,9 @@ class Emulator {
         default:
           return 'auto';
       }
+    } else {
+      return 'host';
     }
-
-    return undefined;
   }
 }
 

@@ -5,34 +5,15 @@
 */
 
 
-function sanitize_matcher(matcher) {
-  if (!matcher._call) {
-    return matcher;
-  }
-
-  const originalMatcher = typeof matcher._call === 'function' ? matcher._call() : matcher._call;
-  return originalMatcher.type ? originalMatcher.value : originalMatcher;
-} 
 class ViewActions {
   static clearGlobalAssertions() {
     return {
       target: {
         type: "Class",
-        value: "androidx.test.espresso.action.ViewActions"
+        value: "android.support.test.espresso.action.ViewActions"
       },
       method: "clearGlobalAssertions",
       args: []
-    };
-  }
-
-  static actionWithAssertions(viewAction) {
-    return {
-      target: {
-        type: "Class",
-        value: "androidx.test.espresso.action.ViewActions"
-      },
-      method: "actionWithAssertions",
-      args: [viewAction]
     };
   }
 
@@ -40,73 +21,29 @@ class ViewActions {
     return {
       target: {
         type: "Class",
-        value: "androidx.test.espresso.action.ViewActions"
+        value: "android.support.test.espresso.action.ViewActions"
       },
       method: "clearText",
       args: []
     };
   }
 
-  static click(inputDevice, buttonState) {
-    function click2(inputDevice, buttonState) {
-      if (typeof inputDevice !== "number") throw new Error("inputDevice should be a number, but got " + (inputDevice + (" (" + (typeof inputDevice + ")"))));
-      if (typeof buttonState !== "number") throw new Error("buttonState should be a number, but got " + (buttonState + (" (" + (typeof buttonState + ")"))));
-      return {
-        target: {
-          type: "Class",
-          value: "androidx.test.espresso.action.ViewActions"
-        },
-        method: "click",
-        args: [{
-          type: "Integer",
-          value: inputDevice
-        }, {
-          type: "Integer",
-          value: buttonState
-        }]
-      };
-    }
-
-    function click0() {
-      return {
-        target: {
-          type: "Class",
-          value: "androidx.test.espresso.action.ViewActions"
-        },
-        method: "click",
-        args: []
-      };
-    }
-
-    function click1(rollbackAction) {
-      return {
-        target: {
-          type: "Class",
-          value: "androidx.test.espresso.action.ViewActions"
-        },
-        method: "click",
-        args: [rollbackAction]
-      };
-    }
-
-    if (arguments.length === 2) {
-      return click2.apply(null, arguments);
-    }
-
-    if (arguments.length === 0) {
-      return click0.apply(null, arguments);
-    }
-
-    if (arguments.length === 1) {
-      return click1.apply(null, arguments);
-    }
+  static click() {
+    return {
+      target: {
+        type: "Class",
+        value: "com.wix.detox.espresso.DetoxViewActions"
+      },
+      method: "click",
+      args: []
+    };
   }
 
   static swipeLeft() {
     return {
       target: {
         type: "Class",
-        value: "androidx.test.espresso.action.ViewActions"
+        value: "android.support.test.espresso.action.ViewActions"
       },
       method: "swipeLeft",
       args: []
@@ -117,7 +54,7 @@ class ViewActions {
     return {
       target: {
         type: "Class",
-        value: "androidx.test.espresso.action.ViewActions"
+        value: "android.support.test.espresso.action.ViewActions"
       },
       method: "swipeRight",
       args: []
@@ -128,7 +65,7 @@ class ViewActions {
     return {
       target: {
         type: "Class",
-        value: "androidx.test.espresso.action.ViewActions"
+        value: "android.support.test.espresso.action.ViewActions"
       },
       method: "swipeDown",
       args: []
@@ -139,7 +76,7 @@ class ViewActions {
     return {
       target: {
         type: "Class",
-        value: "androidx.test.espresso.action.ViewActions"
+        value: "android.support.test.espresso.action.ViewActions"
       },
       method: "swipeUp",
       args: []
@@ -150,7 +87,7 @@ class ViewActions {
     return {
       target: {
         type: "Class",
-        value: "androidx.test.espresso.action.ViewActions"
+        value: "android.support.test.espresso.action.ViewActions"
       },
       method: "closeSoftKeyboard",
       args: []
@@ -161,7 +98,7 @@ class ViewActions {
     return {
       target: {
         type: "Class",
-        value: "androidx.test.espresso.action.ViewActions"
+        value: "android.support.test.espresso.action.ViewActions"
       },
       method: "pressImeActionButton",
       args: []
@@ -172,20 +109,9 @@ class ViewActions {
     return {
       target: {
         type: "Class",
-        value: "androidx.test.espresso.action.ViewActions"
+        value: "android.support.test.espresso.action.ViewActions"
       },
       method: "pressBack",
-      args: []
-    };
-  }
-
-  static pressBackUnconditionally() {
-    return {
-      target: {
-        type: "Class",
-        value: "androidx.test.espresso.action.ViewActions"
-      },
-      method: "pressBackUnconditionally",
       args: []
     };
   }
@@ -194,7 +120,7 @@ class ViewActions {
     return {
       target: {
         type: "Class",
-        value: "androidx.test.espresso.action.ViewActions"
+        value: "android.support.test.espresso.action.ViewActions"
       },
       method: "pressMenuKey",
       args: []
@@ -206,7 +132,7 @@ class ViewActions {
     return {
       target: {
         type: "Class",
-        value: "androidx.test.espresso.action.ViewActions"
+        value: "android.support.test.espresso.action.ViewActions"
       },
       method: "pressKey",
       args: [{
@@ -220,7 +146,7 @@ class ViewActions {
     return {
       target: {
         type: "Class",
-        value: "androidx.test.espresso.action.ViewActions"
+        value: "android.support.test.espresso.action.ViewActions"
       },
       method: "doubleClick",
       args: []
@@ -231,7 +157,7 @@ class ViewActions {
     return {
       target: {
         type: "Class",
-        value: "androidx.test.espresso.action.ViewActions"
+        value: "android.support.test.espresso.action.ViewActions"
       },
       method: "longClick",
       args: []
@@ -242,7 +168,7 @@ class ViewActions {
     return {
       target: {
         type: "Class",
-        value: "androidx.test.espresso.action.ViewActions"
+        value: "android.support.test.espresso.action.ViewActions"
       },
       method: "scrollTo",
       args: []
@@ -254,7 +180,7 @@ class ViewActions {
     return {
       target: {
         type: "Class",
-        value: "androidx.test.espresso.action.ViewActions"
+        value: "android.support.test.espresso.action.ViewActions"
       },
       method: "typeTextIntoFocusedView",
       args: [stringToBeTyped]
@@ -266,7 +192,7 @@ class ViewActions {
     return {
       target: {
         type: "Class",
-        value: "androidx.test.espresso.action.ViewActions"
+        value: "android.support.test.espresso.action.ViewActions"
       },
       method: "typeText",
       args: [stringToBeTyped]
@@ -278,7 +204,7 @@ class ViewActions {
     return {
       target: {
         type: "Class",
-        value: "androidx.test.espresso.action.ViewActions"
+        value: "android.support.test.espresso.action.ViewActions"
       },
       method: "replaceText",
       args: [stringToBeSet]
@@ -290,7 +216,7 @@ class ViewActions {
     return {
       target: {
         type: "Class",
-        value: "androidx.test.espresso.action.ViewActions"
+        value: "android.support.test.espresso.action.ViewActions"
       },
       method: "openLinkWithText",
       args: [linkText]
@@ -302,28 +228,10 @@ class ViewActions {
     return {
       target: {
         type: "Class",
-        value: "androidx.test.espresso.action.ViewActions"
+        value: "android.support.test.espresso.action.ViewActions"
       },
       method: "openLinkWithUri",
       args: [uri]
-    };
-  }
-
-  static repeatedlyUntil(action, desiredStateMatcher, maxAttempts) {
-    if (typeof maxAttempts !== "number") throw new Error("maxAttempts should be a number, but got " + (maxAttempts + (" (" + (typeof maxAttempts + ")"))));
-    return {
-      target: {
-        type: "Class",
-        value: "androidx.test.espresso.action.ViewActions"
-      },
-      method: "repeatedlyUntil",
-      args: [action, {
-        type: "Invocation",
-        value: sanitize_matcher(desiredStateMatcher)
-      }, {
-        type: "Integer",
-        value: maxAttempts
-      }]
     };
   }
 

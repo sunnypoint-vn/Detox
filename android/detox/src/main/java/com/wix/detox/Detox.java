@@ -1,21 +1,19 @@
 package com.wix.detox;
 
-import android.app.Activity;
-import android.app.Instrumentation;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.RemoteException;
 import android.support.annotation.NonNull;
+import android.support.test.InstrumentationRegistry;
+import android.support.test.rule.ActivityTestRule;
 import android.support.test.uiautomator.UiDevice;
 import android.support.test.uiautomator.UiObject;
 import android.support.test.uiautomator.UiObjectNotFoundException;
 import android.support.test.uiautomator.UiSelector;
-import androidx.test.platform.app.InstrumentationRegistry;
-
-import androidx.test.rule.ActivityTestRule;
 
 /**
  * <p>Static class.</p>
@@ -71,13 +69,9 @@ import androidx.test.rule.ActivityTestRule;
  * <p>If not set, then Detox tests are no ops. So it's safe to mix it with other tests.</p>
  */
 public final class Detox {
-    private static final String DETOX_URL_OVERRIDE_ARG = "detoxURLOverride";
-    private static final long ACTIVITY_LAUNCH_TIMEOUT = 10000L;
+    static ActivityTestRule sActivityTestRule;
 
-    private static ActivityTestRule sActivityTestRule;
-
-    private Detox() {
-    }
+    private Detox() {}
 
     /**
      * <p>
@@ -86,12 +80,12 @@ public final class Detox {
      *
      * <p>
      * In case you have a non-standard React Native application, consider using
-     * {@link #runTests(ActivityTestRule, Context)}}.
+     * {@link Detox#runTests(ActivityTestRule, Object)}}.
      * </p>
      * @param activityTestRule the activityTestRule
      */
     public static void runTests(ActivityTestRule activityTestRule) {
-        Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext().getApplicationContext();
+        Context appContext = InstrumentationRegistry.getTargetContext().getApplicationContext();
         runTests(activityTestRule, appContext);
     }
 
@@ -110,13 +104,19 @@ public final class Detox {
      * </p>
      *
      * @param activityTestRule the activityTestRule
-     * @param context an object that has a {@code getReactNativeHost()} method
+     * @param Context an object that has a {@code getReactNativeHost()} method
      */
     public static void runTests(ActivityTestRule activityTestRule, @NonNull final Context context) {
         sActivityTestRule = activityTestRule;
+        Intent intent = null;
+        Bundle arguments = InstrumentationRegistry.getArguments();
+        String detoxURLOverride = arguments.getString("detoxURLOverride");
+        if (detoxURLOverride != null) {
+            intent = intentWithUrl(detoxURLOverride);
+        }
 
-        Intent intent = extractInitialIntent();
         activityTestRule.launchActivity(intent);
+
 
         // Kicks off another thread and attaches a Looper to that.
         // The goal is to keep the test thread intact,
@@ -137,7 +137,6 @@ public final class Detox {
             }
         }, "com.wix.detox.manager");
         t.start();
-
         try {
             t.join();
         } catch (InterruptedException e) {
@@ -146,42 +145,32 @@ public final class Detox {
         }
     }
 
-    public static void startActivityFromUrl(String url) {
-        // Ideally, we would just call sActivityTestRule.launchActivity(intentWithUrl(url)) and get it over with.
-        // BUT!!! as it turns out, Espresso has an issue where doing this for an activity running in the background
-        // would have Espresso set up an ActivityMonitor which will spend its time waiting for the activity to load, *without
-        // ever being released*. It will finally fail after a 45 seconds timeout.
-        // Without going into full details, it seems that activity test rules were not meant to be used this way. However,
-        // the all-new ActivityScenario implementation introduced in androidx could probably support this (e.g. by using
-        // dedicated methods such as moveToState(), which give better control over the lifecycle).
-        // In any case, this is the core reason for this issue: https://github.com/wix/Detox/issues/1125
-        // What it forces us to do, then, is this -
-        // 1. Launch the activity by "ourselves" from the OS (i.e. using context.startActivity()).
-        // 2. Set up an activity monitor by ourselves -- such that it would block until the activity is ready.
-        // ^ Hence the code below.
-
-        final Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
-
-        final Intent intent = intentWithUrl(url);
-        final Activity activity = sActivityTestRule.getActivity();
-        final Instrumentation.ActivityMonitor activityMonitor = new Instrumentation.ActivityMonitor(activity.getClass().getName(), null, true);
-
-        activity.startActivity(intent);
-        instrumentation.addMonitor(activityMonitor);
-        instrumentation.waitForMonitorWithTimeout(activityMonitor, ACTIVITY_LAUNCH_TIMEOUT);
+    public static void launchActivity(Intent intent) {
+        sActivityTestRule.launchActivity(intent);
     }
+
+    public static void startActivityFromUrl(String url) {
+        launchActivity(intentWithUrl(url));
+    }
+
+    public static Intent intentWithUrl(String url) {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(Uri.parse(url));
+        return intent;
+    }
+
 
     // TODO: Can't get to launch the app back to previous instance using only intents from inside instrumentation (not sure why).
     // this is a (hopefully) temp solution. Should use intents instead.
     public static void launchMainActivity() throws RemoteException, UiObjectNotFoundException {
-        final Context targetContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
+        Context targetContext = InstrumentationRegistry.getTargetContext();
 
 //        Intent intent = targetContext.getPackageManager().getLaunchIntentForPackage(targetContext.getPackageName());
 //        intent.setPackage(null);
 //        intent.removeCategory(Intent.CATEGORY_LAUNCHER);;
 //        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
 //        Log.d("Detox", intent.toString());
-//        sActivityTestRule.launchActivity(intent);
+//        launchActivity(intent);
 
         UiDevice device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
         device.pressRecentApps();
@@ -189,19 +178,5 @@ public final class Detox {
         String appName = targetContext.getApplicationInfo().loadLabel(targetContext.getPackageManager()).toString();
         UiObject recentApp = device.findObject(selector.descriptionContains(appName));
         recentApp.click();
-    }
-
-    private static Intent extractInitialIntent() {
-        String detoxURLOverride = InstrumentationRegistry.getArguments().getString(DETOX_URL_OVERRIDE_ARG);
-        if (detoxURLOverride != null) {
-            return intentWithUrl(detoxURLOverride);
-        }
-        return null;
-    }
-
-    private static Intent intentWithUrl(String url) {
-        final Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setData(Uri.parse(url));
-        return intent;
     }
 }

@@ -106,7 +106,7 @@ class ADB {
 
     let childProcess;
     if (apiLvl >= 24) {
-      childProcess = await this.adbCmd(deviceId, `install -r -g -t ${apkPath}`);
+      childProcess = await this.adbCmd(deviceId, `install -r -g ${apkPath}`);
     } else {
       childProcess = await this.adbCmd(deviceId, `install -rg ${apkPath}`);
     }
@@ -131,7 +131,7 @@ class ADB {
   async pidof(deviceId, bundleId) {
     const bundleIdRegex = escape.inQuotedRegexp(bundleId) + '$';
 
-    const processes = await this.shell(deviceId, `ps | grep "${bundleIdRegex}"`, {silent: true}).catch(() => '');
+    const processes = await this.shell(deviceId, `ps | grep "${bundleIdRegex}"`).catch(() => '');
     if (!processes) {
       return NaN;
     }

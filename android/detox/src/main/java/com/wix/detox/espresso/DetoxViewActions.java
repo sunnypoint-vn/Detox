@@ -1,14 +1,13 @@
 package com.wix.detox.espresso;
 
+import android.support.test.espresso.UiController;
+import android.support.test.espresso.ViewAction;
+import android.support.test.espresso.action.ViewActions;
 import android.view.View;
 
 import com.wix.detox.ReactNativeSupport;
 
 import org.hamcrest.Matcher;
-
-import androidx.test.espresso.UiController;
-import androidx.test.espresso.ViewAction;
-import androidx.test.espresso.action.ViewActions;
 
 /**
  * An alternative to {@link ViewActions} - providing alternative implementations, where needed.
