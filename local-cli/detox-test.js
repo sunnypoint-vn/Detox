@@ -11,6 +11,7 @@ const DetoxConfigError = require('../src/errors/DetoxConfigError');
 const config = require(path.join(process.cwd(), 'package.json')).detox;
 
 program
+  .allowUnknownOption()
   .option('-o, --runner-config [config]',
     `Test runner config file, defaults to e2e/mocha.opts for mocha and e2e/config.json' for jest`)
   .option('-s, --specs [relativePath]',
@@ -43,6 +44,8 @@ program
     'Specify test file to run')
   .option('-H, --headless',
     '[Android Only] Launch Emulator in headless mode. Useful when running on CI.')
+  .option('--gpu [gpu mode]',
+    '[Android Only] Launch Emulator with the specific -gpu [gpu mode] parameter.')
   .option('-w, --workers <n>',
     '[iOS Only] Specifies number of workers the test runner should spawn, requires a test runner with parallel execution support (Detox CLI currently supports Jest)', 1)
   .option('-n, --device-name [name]',
@@ -89,6 +92,16 @@ function run() {
   }
 }
 
+function collectExtraArgs() {
+  const parsed = program.parseOptions(program.normalize(process.argv.slice(2)));
+
+  if (parsed && Array.isArray(parsed.unknown) && parsed.unknown.length > 0) {
+    return parsed.unknown.join(' ');
+  }
+
+  return '';
+}
+
 function getConfigFor(keys, fallback) {
   for (let i = 0; i < keys.length; i++) {
     const key = keys[i];
@@ -116,14 +129,15 @@ function runMocha() {
   const screenshots = program.takeScreenshots ? `--take-screenshots ${program.takeScreenshots}` : '';
   const videos = program.recordVideos ? `--record-videos ${program.recordVideos}` : '';
   const headless = program.headless ? `--headless` : '';
+  const gpu = program.gpu ? `--gpu ${program.gpu}` : '';
   const color = program.color ? '' : '--no-colors';
   const deviceName = program.deviceName ? `--device-name "${program.deviceName}"` : '';
 
   const debugSynchronization = program.debugSynchronization ? `--debug-synchronization ${program.debugSynchronization}` : '';
   const binPath = path.join('node_modules', '.bin', 'mocha');
   const command = `${binPath} ${testFolder} ${configFile} ${configuration} ${loglevel} ${color} ` +
-    `${cleanup} ${reuse} ${debugSynchronization} ${platformString} ${headless} ` +
-    `${logs} ${screenshots} ${videos} ${artifactsLocation} ${deviceName}`;
+    `${cleanup} ${reuse} ${debugSynchronization} ${platformString} ${headless} ${gpu} ` +
+    `${logs} ${screenshots} ${videos} ${artifactsLocation} ${deviceName} ${collectExtraArgs()}`;
 
   console.log(command);
   cp.execSync(command, {stdio: 'inherit'});
@@ -134,14 +148,16 @@ function runJest() {
 
   const platformString = platform ? shellQuote(`--testNamePattern=^((?!${getPlatformSpecificString(platform)}).)*$`) : '';
   const binPath = path.join('node_modules', '.bin', 'jest');
+  const quotedTestFolder = `"${testFolder}"`
   const color = program.color ? '' : ' --no-color';
-  const command = `${binPath} ${testFolder} ${configFile}${color} --maxWorkers=${program.workers} ${platformString}`;
+  const command = `${binPath} ${quotedTestFolder} ${configFile}${color} --maxWorkers=${program.workers} ${platformString} ${collectExtraArgs()}`;
   const detoxEnvironmentVariables = {
     configuration: program.configuration,
     loglevel: program.loglevel,
     cleanup: program.cleanup,
     reuse: program.reuse,
     debugSynchronization: program.debugSynchronization,
+    gpu: program.gpu,
     headless: program.headless,
     artifactsLocation: program.artifactsLocation,
     recordLogs: program.recordLogs,
