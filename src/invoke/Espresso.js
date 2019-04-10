@@ -1,6 +1,6 @@
 const target = {
   type: 'Class',
-  value: 'androidx.test.espresso.Espresso'
+  value: 'android.support.test.espresso.Espresso'
 };
 
 module.exports = {

@@ -15,50 +15,47 @@ function sanitize_uiAccessibilityTraits(value) {
       case 'link':
         traits |= 2;
         break;
-      case 'image':
+      case 'header':
         traits |= 4;
         break;
-      case 'selected':
+      case 'search':
         traits |= 8;
         break;
-      case 'plays':
+      case 'image':
         traits |= 16;
         break;
-      case 'key':
+      case 'selected':
         traits |= 32;
         break;
-      case 'text':
+      case 'plays':
         traits |= 64;
         break;
-      case 'summary':
+      case 'key':
         traits |= 128;
         break;
-      case 'disabled':
+      case 'text':
         traits |= 256;
         break;
-      case 'frequentUpdates':
+      case 'summary':
         traits |= 512;
         break;
-      case 'search':
+      case 'disabled':
         traits |= 1024;
         break;
-      case 'startsMedia':
+      case 'frequentUpdates':
         traits |= 2048;
         break;
-      case 'adjustable':
+      case 'startsMedia':
         traits |= 4096;
         break;
-      case 'allowsDirectInteraction':
+      case 'adjustable':
         traits |= 8192;
         break;
-      case 'pageTurn':
+      case 'allowsDirectInteraction':
         traits |= 16384;
         break;
-      case 'tabBar':
+      case 'pageTurn':
         traits |= 32768;
-        break;
-      case 'header':
-        traits |= 65536;
         break;
       default:
         throw new Error(
@@ -463,25 +460,6 @@ class GREYMatchers {
     };
   }
 
-  /*Matcher that matches UIStepper with value as @c value.
-  
-  @param value A value that the UIStepper should be checked for.
-  
-  @return A matcher for checking UIStepper values.*/
-  static matcherForStepperValue(value) {
-    return {
-      target: {
-        type: "Class",
-        value: "GREYMatchers"
-      },
-      method: "matcherForStepperValue:",
-      args: [{
-        type: "NSNumber",
-        value: value
-      }]
-    };
-  }
-
   /*Matcher that matches a UISlider's value.
   
   @param valueMatcher A matcher for the UISlider's value. You must provide a valid
@@ -576,31 +554,6 @@ class GREYMatchers {
       },
       method: "matcherForNotNil",
       args: []
-    };
-  }
-
-  /*A Matcher for NSNumbers that matches when the examined number is within a specified @c delta
-  from the specified value.
-  
-  @param value The expected value of the number being matched.
-  
-  @param delta The delta within which matches are allowed
-  
-  @return A matcher that checks if a number is close to a specified @c value.*/
-  static matcherForCloseToDelta(value, delta) {
-    return {
-      target: {
-        type: "Class",
-        value: "GREYMatchers"
-      },
-      method: "matcherForCloseTo:delta:",
-      args: [{
-        type: "NSNumber",
-        value: value
-      }, {
-        type: "NSNumber",
-        value: delta
-      }]
     };
   }
 

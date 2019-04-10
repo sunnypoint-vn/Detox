@@ -35,28 +35,6 @@ class Detox {
     };
   }
 
-  static launchMainActivity() {
-    return {
-      target: {
-        type: "Class",
-        value: "com.wix.detox.Detox"
-      },
-      method: "launchMainActivity",
-      args: []
-    };
-  }
-
-  static extractInitialIntent() {
-    return {
-      target: {
-        type: "Class",
-        value: "com.wix.detox.Detox"
-      },
-      method: "extractInitialIntent",
-      args: []
-    };
-  }
-
   static intentWithUrl(url) {
     if (typeof url !== "string") throw new Error("url should be a string, but got " + (url + (" (" + (typeof url + ")"))));
     return {
@@ -66,6 +44,17 @@ class Detox {
       },
       method: "intentWithUrl",
       args: [url]
+    };
+  }
+
+  static launchMainActivity() {
+    return {
+      target: {
+        type: "Class",
+        value: "com.wix.detox.Detox"
+      },
+      method: "launchMainActivity",
+      args: []
     };
   }
 
