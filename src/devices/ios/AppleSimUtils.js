@@ -1,5 +1,6 @@
 const _ = require('lodash');
 const exec = require('../../utils/exec');
+const log = require('../../utils/logger').child({ __filename });
 const environment = require('../../utils/environment');
 
 class AppleSimUtils {
@@ -39,8 +40,7 @@ class AppleSimUtils {
       os = deviceInfo.newestRuntime.version;
     }
 
-    //const response = await this._execAppleSimUtils({ args: `--list --byType "${type}" --byOS "${os}"`}, statusLogs, 1);
-    const response = await this._execAppleSimUtils({ args: `--list --byName "${type}"`}, statusLogs, 1);
+    const response = await this._execAppleSimUtils({ args: `--list --byType "${type}" --byOS "${os}"`}, statusLogs, 1);
     const parsed = this._parseResponseFromAppleSimUtils(response);
     const udids = _.map(parsed, 'udid');
     if (!udids || !udids.length || !udids[0]) {
@@ -254,8 +254,6 @@ class AppleSimUtils {
   async _launchMagically(frameworkPath, logsInfo, udid, bundleId, args, languageAndLocale) {
     const statusLogs = {
       trying: `Launching ${bundleId}...`,
-      successful: `${bundleId} launched. The stdout and stderr logs were recreated, you can watch them with:\n` +
-      `        tail -F ${logsInfo.absJoined}`
     };
 
     let dylibs = `${frameworkPath}/Detox`;
@@ -271,12 +269,17 @@ class AppleSimUtils {
       if (!!languageAndLocale && !!languageAndLocale.language) {
         launchBin += ` -AppleLanguages "(${languageAndLocale.language})"`;
       }
-
+  
       if (!!languageAndLocale && !!languageAndLocale.locale) {
         launchBin += ` -AppleLocale ${languageAndLocale.locale}`;
       }
 
-    return await exec.execWithRetriesAndLogs(launchBin, undefined, statusLogs, 1);
+    const result = await exec.execWithRetriesAndLogs(launchBin, undefined, statusLogs, 1);
+    
+    log.info(`${bundleId} launched. The stdout and stderr logs were recreated, you can watch them with:\n` +
+             `        tail -F ${logsInfo.absJoined}`);
+
+    return result;
   }
 
   _parseLaunchId(result) {

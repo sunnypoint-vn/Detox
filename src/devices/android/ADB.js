@@ -106,7 +106,7 @@ class ADB {
 
     let childProcess;
     if (apiLvl >= 24) {
-      childProcess = await this.adbCmd(deviceId, `install -r -g ${apkPath}`);
+      childProcess = await this.adbCmd(deviceId, `install -r -g -t ${apkPath}`);
     } else {
       childProcess = await this.adbCmd(deviceId, `install -rg ${apkPath}`);
     }
@@ -122,7 +122,6 @@ class ADB {
 
   async uninstall(deviceId, appId) {
     await this.adbCmd(deviceId, `uninstall ${appId}`);
-    await this.adbCmd(deviceId, `shell "rm -rf /data/app/${appId}-*"`);
   }
 
   async terminate(deviceId, appId) {
@@ -132,7 +131,7 @@ class ADB {
   async pidof(deviceId, bundleId) {
     const bundleIdRegex = escape.inQuotedRegexp(bundleId) + '$';
 
-    const processes = await this.shell(deviceId, `ps | grep "${bundleIdRegex}"`).catch(() => '');
+    const processes = await this.shell(deviceId, `ps | grep "${bundleIdRegex}"`, {silent: true}).catch(() => '');
     if (!processes) {
       return NaN;
     }
@@ -167,9 +166,6 @@ class ADB {
     const lvl = Number(await this.shell(deviceId, `getprop ro.build.version.sdk`));
     this._cachedApiLevels.set(deviceId, lvl);
 
-    //restart server
-    await this.adbCmd(deviceId, `kill-server`);
-    await this.adbCmd(deviceId, `start-server`)
     return lvl;
   }
 
@@ -268,10 +264,9 @@ class ADB {
   }
 
   async adbCmd(deviceId, params, options) {
-    //const serial = `${deviceId ? `-s ${deviceId}` : ''}`;
-    const serial = `${deviceId ? '' : ''}`;
+    const serial = `${deviceId ? `-s ${deviceId}` : ''}`;
     const cmd = `${this.adbBin} ${serial} ${params}`;
-    const retries = _.get(options, 'retries', 2);
+    const retries = _.get(options, 'retries', 1);
     _.unset(options, 'retries');
 
     return execWithRetriesAndLogs(cmd, options, undefined, retries);

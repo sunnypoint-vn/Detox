@@ -11,9 +11,7 @@ const argparse = require('../../utils/argparse');
 
 class Emulator {
   constructor() {
-    const newEmulatorPath = path.join(Environment.getAndroidSDKPath(), 'emulator', 'emulator');
-    const oldEmulatorPath = path.join(Environment.getAndroidSDKPath(), 'tools', 'emulator');
-    this.emulatorBin = fs.existsSync(newEmulatorPath) ? newEmulatorPath : oldEmulatorPath;
+    this.emulatorBin = Environment.getAndroidEmulatorPath();
   }
 
   async listAvds() {
@@ -29,12 +27,15 @@ class Emulator {
   async boot(emulatorName) {
     const emulatorArgs = _.compact([
       '-verbose',
-      '-gpu', this.gpuMethod(),
       '-no-audio',
-      //'-wipe-data',
       argparse.getArgValue('headless') ? '-no-window' : '',
       `@${emulatorName}`
     ]);
+
+    const gpuMethod = this.gpuMethod();
+    if(gpuMethod) {
+      emulatorArgs.push('-gpu', gpuMethod);
+    }
 
     let childProcessOutput;
     const tempLog = `./${emulatorName}.log`;
@@ -83,6 +84,11 @@ class Emulator {
   }
 
   gpuMethod() {
+    const gpuArgument = argparse.getArgValue('gpu');
+    if(gpuArgument) {
+      return gpuArgument;
+    }
+
     if (argparse.getArgValue('headless')) {
       switch (os.platform()) {
         case 'darwin':
@@ -94,9 +100,9 @@ class Emulator {
         default:
           return 'auto';
       }
-    } else {
-      return 'host';
     }
+
+    return undefined;
   }
 }
 
