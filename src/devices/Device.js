@@ -209,6 +209,24 @@ class Device {
     return this.deviceDriver.getPlatform(this._deviceId);
   }
 
+  getDeviceID() {
+    return this._deviceId;
+  }
+
+  getDeviceName(){
+    let devicename=this._deviceConfig.name;
+    devicename=devicename.trim();
+    devicename=devicename.replace(' ','');
+      return devicename;
+    }
+
+  getAppName(){
+    let appName=this._bundleId;
+    let names=appName.split('.');
+    //appName=appName[];
+    return names[2];
+  }
+
   async _cleanup() {
     await this.deviceDriver.cleanup(this._deviceId, this._bundleId);
   }
