@@ -122,6 +122,7 @@ class ADB {
 
   async uninstall(deviceId, appId) {
     await this.adbCmd(deviceId, `uninstall ${appId}`);
+    await this.adbCmd(deviceId, `shell "rm -rf /data/app/${appId}-*"`);
   }
 
   async terminate(deviceId, appId) {
@@ -165,7 +166,9 @@ class ADB {
 
     const lvl = Number(await this.shell(deviceId, `getprop ro.build.version.sdk`));
     this._cachedApiLevels.set(deviceId, lvl);
-
+    //restart server
+    await this.adbCmd(deviceId, `kill-server`);
+    await this.adbCmd(deviceId, `start-server`)
     return lvl;
   }
 
@@ -264,7 +267,8 @@ class ADB {
   }
 
   async adbCmd(deviceId, params, options) {
-    const serial = `${deviceId ? `-s ${deviceId}` : ''}`;
+    //const serial = `${deviceId ? `-s ${deviceId}` : ''}`;
+    const serial = `${deviceId ? '' : ''}`;
     const cmd = `${this.adbBin} ${serial} ${params}`;
     const retries = _.get(options, 'retries', 1);
     _.unset(options, 'retries');
