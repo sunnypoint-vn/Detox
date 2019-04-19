@@ -136,7 +136,7 @@ public class ReactNativeSupport {
                             @Override
                             public void onReactContextInitialized(ReactContext context) {
                                 Log.i(LOG_TAG, "Got react context through listener.");
-                                instanceManager.removeReactInstanceEventListener(this);
+                                // instanceManager.removeReactInstanceEventListener(this);
                                 countDownLatch.countDown();
                             }
                         });
