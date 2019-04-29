@@ -28,6 +28,7 @@ class Emulator {
     const emulatorArgs = _.compact([
       '-verbose',
       '-no-audio',
+      '-wipe-data',
       argparse.getArgValue('headless') ? '-no-window' : '',
       `@${emulatorName}`
     ]);
